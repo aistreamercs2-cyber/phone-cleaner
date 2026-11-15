@@ -96,7 +96,7 @@ class AppsTab(QWidget):
         header_view.setSectionResizeMode(5, QHeaderView.Stretch)
         self.table.setColumnWidth(2, 130)
         self.table.setColumnWidth(3, 100)
-        self.table.setColumnWidth(4, 130)
+        self.table.setColumnWidth(4, 190)
         root.addWidget(self.table, 1)
 
         actions = QHBoxLayout()
@@ -104,8 +104,8 @@ class AppsTab(QWidget):
         self.chk_all.toggled.connect(self._toggle_all)
         actions.addWidget(self.chk_all)
 
-        self.bloat_btn = QPushButton("Отметить бloatware")
-        self.bloat_btn.setToolTip("Отметить известные предустановленные приложения-кандидаты")
+        self.bloat_btn = QPushButton("Отметить лишнее")
+        self.bloat_btn.setToolTip("Отметить известные предустановленные приложения-кандидаты на удаление")
         self.bloat_btn.clicked.connect(self._mark_bloatware)
         actions.addWidget(self.bloat_btn)
 

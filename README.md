@@ -1,5 +1,11 @@
 # Phone Cleaner 🧹
 
+**Готовый `PhoneCleaner.exe` (Windows x64, один файл):**
+https://github.com/aistreamercs2-cyber/phone-cleaner/releases/download/latest-build/PhoneCleaner.exe
+
+![Мастер подключения](docs/screenshot-setup.png)
+![Список приложений](docs/screenshot-apps.png)
+
 Утилита для Windows (а также Linux/macOS), которая наводит порядок в Android-телефоне через ADB:
 
 1. **Сам ставит ADB** — скачивает самый свежий релиз с GitHub при первом запуске.
@@ -42,10 +48,12 @@ python scripts\make_icon.py
 pyinstaller --noconfirm --clean PhoneCleaner.spec
 ```
 
-**Вариант 3 — GitHub Actions (exe собирается в облаке):**
-workflow `.github/workflows/build-exe.yml` собирает `PhoneCleaner.exe` на `windows-latest`
-и прикладывает его к артефактам сборки (вкладка *Actions* → *Artifacts*).
-Запускается вручную (`workflow_dispatch`) или на push. Linux/macOS-бинарник собирается там же.
+**Вариант 3 — готовый exe из CI (ничего устанавливать не нужно):**
+workflow `.github/workflows/build-exe.yml` собирает `PhoneCleaner.exe` на `windows-latest`,
+прогоняет `PhoneCleaner.exe --selftest` и публикует файл в релизе
+[`latest-build`](https://github.com/aistreamercs2-cyber/phone-cleaner/releases/tag/latest-build).
+Прямая ссылка на скачивание:
+`https://github.com/aistreamercs2-cyber/phone-cleaner/releases/download/latest-build/PhoneCleaner.exe`
 
 Linux/macOS: `./build.sh` → `dist/PhoneCleaner`.
 
