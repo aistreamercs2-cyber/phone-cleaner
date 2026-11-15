@@ -1,0 +1,113 @@
+name: build-exe
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**", "main"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pytest
+      - name: Pytest
+        run: python -m pytest tests -q
+        env:
+          QT_QPA_PLATFORM: offscreen
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+      - name: Make icon (if missing)
+        if: ${{ hashFiles('phone_cleaner/assets/icon.ico') == '' }}
+        continue-on-error: true
+        run: python scripts/make_icon.py
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Build exe
+        run: pyinstaller --noconfirm --clean PhoneCleaner.spec
+      - name: Smoke test exe (--selftest)
+        run: .\dist\PhoneCleaner.exe --selftest
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneCleaner-windows
+          path: dist/PhoneCleaner.exe
+          if-no-files-found: error
+
+  build-linux:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Qt runtime libs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxcb-cursor0 libdbus-1-3 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xkb1 libxkbcommon-x11-0 libxcb-util1 libxcb-sync1
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+      - name: Make icon (if missing)
+        if: ${{ hashFiles('phone_cleaner/assets/icon.ico') == '' }}
+        continue-on-error: true
+        run: python scripts/make_icon.py
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Build binary
+        run: pyinstaller --noconfirm --clean PhoneCleaner.spec
+      - name: Smoke test binary (--selftest)
+        run: ./dist/PhoneCleaner --selftest
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneCleaner-linux
+          path: dist/PhoneCleaner
+          if-no-files-found: error
+
+  release:
+    needs: [build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhoneCleaner-windows
+          path: release
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-build
+          name: Phone Cleaner — последняя сборка
+          body: |
+            Собранный одним файлом PhoneCleaner.exe (Windows x64).
+            Скачайте файл ниже и запустите — ADB программа поставит сама при первом запуске.
+          files: release/PhoneCleaner.exe
+          overwrite_files: true
+          make_latest: true
