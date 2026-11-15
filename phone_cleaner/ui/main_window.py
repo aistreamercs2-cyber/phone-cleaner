@@ -259,4 +259,9 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event) -> None:  # noqa: N802
         self._monitor_timer.stop()
+        self.onboarding.stop()
+        for tab in (self.info_tab, self.apps_tab, self.files_tab, self.control_tab):
+            for task in list(getattr(tab, "_running_tasks", [])):
+                if task.isRunning():
+                    task.wait(3000)
         super().closeEvent(event)

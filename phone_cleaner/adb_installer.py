@@ -155,9 +155,7 @@ def _windows_sources(cb: ProgressCb | None):
                 yield ("zip", Asset(name, asset["browser_download_url"], f"GitHub {ADBKIT_REPO} {tag}"))
         if tag:
             yield ("raw", Asset("adb.exe (raw)", "", f"GitHub {ADBKIT_REPO} {tag}"))
-    yield ("zip", Asset("platform-tools (Google)", GOOGLE_URL.format(os="windows"), "Google"))
-
-    # ADB-and-Fastboot++ — второй по популярности GitHub-источник
+    # второй GitHub-источник
     release2 = latest_release("K3V1991/ADB-and-FastbootPlusPlus")
     if release2:
         for asset in release2.get("assets", []):
@@ -165,6 +163,9 @@ def _windows_sources(cb: ProgressCb | None):
             if name.lower().endswith(".zip"):
                 yield ("zip", Asset(name, asset["browser_download_url"],
                                     f"GitHub K3V1991/ADB-and-FastbootPlusPlus {release2.get('tag_name')}"))
+
+    # запасной вариант — официальный архив Google
+    yield ("zip", Asset("platform-tools (Google)", GOOGLE_URL.format(os="windows"), "Google"))
 
 
 def _unix_sources(cb: ProgressCb | None):

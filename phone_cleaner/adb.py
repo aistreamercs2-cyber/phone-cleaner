@@ -217,13 +217,13 @@ class Adb:
 
     # ---------------------------------------------------------------- files
     def du(self, path: str = "/sdcard", serial: str | None = None) -> list[tuple[str, int]]:
-        return parsers.parse_du(self.shell(f"du -ak {shlex.quote(path)} 2>/dev/null", timeout=180,
+        return parsers.parse_du(self.shell(f"du -ak {quote_path(path)} 2>/dev/null", timeout=180,
                                            serial=serial).stdout)
 
     def delete_paths(self, paths: Iterable[str], serial: str | None = None) -> list[tuple[str, bool, str]]:
         report = []
         for path in paths:
-            result = self.shell(f"rm -rf {shlex.quote(path)}", timeout=120, serial=serial)
+            result = self.shell(f"rm -rf {quote_path(path)}", timeout=120, serial=serial)
             report.append((path, result.ok, result.output.strip()))
         return report
 
@@ -306,6 +306,13 @@ class CommandRunner:
                 proc.terminate()
             except OSError:
                 pass
+
+
+def quote_path(path: str) -> str:
+    """Кавычки для shell, но маски (*, ?) оставляем — иначе glob не раскроется."""
+    if "*" in path or "?" in path:
+        return path
+    return shlex.quote(path)
 
 
 def parse_shell_command(command: str) -> list[str]:

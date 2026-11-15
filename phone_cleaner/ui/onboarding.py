@@ -255,6 +255,13 @@ class OnboardingWidget(QWidget):
         from PySide6.QtCore import QTimer
         QTimer.singleShot(800, lambda: self.ready.emit(serial))
 
+    def stop(self) -> None:
+        """Останавливает опрос устройств и ждёт активные задачи."""
+        self._monitoring = False
+        for task in list(getattr(self, "_tasks", [])):
+            if task.isRunning():
+                task.wait(4000)
+
     def _open_dev_settings(self) -> None:
         """Пробуем открыть настройки разработчика на телефоне."""
         if not self.adb_path:
