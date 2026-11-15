@@ -37,6 +37,8 @@ jobs:
           python -m pip install -r requirements.txt pyinstaller
       - name: Make icon
         run: python scripts/make_icon.py
+        env:
+          QT_QPA_PLATFORM: offscreen
       - name: Build exe
         run: pyinstaller --noconfirm --clean PhoneCleaner.spec
       - name: Smoke test exe (--selftest)
@@ -68,6 +70,8 @@ jobs:
           python -m pip install -r requirements.txt pyinstaller
       - name: Make icon
         run: python scripts/make_icon.py
+        env:
+          QT_QPA_PLATFORM: offscreen
       - name: Build binary
         run: pyinstaller --noconfirm --clean PhoneCleaner.spec
       - name: Smoke test binary (--selftest)

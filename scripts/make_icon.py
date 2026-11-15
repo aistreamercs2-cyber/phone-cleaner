@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import struct
 import sys
 from pathlib import Path
@@ -82,6 +83,8 @@ def build_ico(images: dict[int, QImage], destination: Path) -> None:
 
 
 def main() -> int:
+    # Иконка рисуется без окна: на серверах/в CI экрана нет, поэтому offscreen
+    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
     app = QGuiApplication(sys.argv[:1])  # noqa: F841 - нужен для QImage/шрифтов
     out_dir = Path(__file__).resolve().parent.parent / "phone_cleaner" / "assets"
     out_dir.mkdir(parents=True, exist_ok=True)
