@@ -1,5 +1,8 @@
 name: build-exe
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   push:
@@ -88,3 +91,23 @@ jobs:
           name: PhoneCleaner-linux
           path: dist/PhoneCleaner
           if-no-files-found: error
+
+  release:
+    needs: [build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhoneCleaner-windows
+          path: release
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-build
+          name: Phone Cleaner — последняя сборка
+          body: |
+            Собранный одним файлом PhoneCleaner.exe (Windows x64).
+            Скачайте файл ниже и запустите — ADB программа поставит сама при первом запуске.
+          files: release/PhoneCleaner.exe
+          overwrite_files: true
+          make_latest: true
