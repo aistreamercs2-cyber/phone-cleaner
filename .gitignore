@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Сборка
+build/
+dist/
+*.spec.bak
+!PhoneCleaner.spec
+
+# Тесты/инструменты
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ОС
+.DS_Store
+Thumbs.db
